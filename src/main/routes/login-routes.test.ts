@@ -20,6 +20,10 @@ describe('Login Routes', () => {
     await accountCollection.deleteMany({})
   })
 
+  test('should not failt', () => {
+    expect(1).toBe(1)
+  })
+
   describe('POST /signup', () => {
     test('Should return 200 on signup', async () => {
       await request(app)
@@ -31,6 +35,28 @@ describe('Login Routes', () => {
           passwordConfirmation: '123'
         })
         .expect(200)
+    })
+
+    test('Should return 403 on signup with already in use email', async () => {
+      await request(app)
+        .post('/api/signup')
+        .send({
+          name: 'José',
+          email: 'jose.123@gmail.com',
+          password: '123',
+          passwordConfirmation: '123'
+        })
+        .expect(200)
+
+      await request(app)
+        .post('/api/signup')
+        .send({
+          name: 'José',
+          email: 'jose.123@gmail.com',
+          password: '123',
+          passwordConfirmation: '123'
+        })
+        .expect(403)
     })
   })
 
@@ -50,9 +76,7 @@ describe('Login Routes', () => {
         })
         .expect(200)
     })
-  })
 
-  describe('POST /login', () => {
     test('Should return 401 on login with invalid credentials', async () => {
       await request(app)
         .post('/api/login')
