@@ -20,10 +20,6 @@ describe('Login Routes', () => {
     await accountCollection.deleteMany({})
   })
 
-  test('should not failt', () => {
-    expect(1).toBe(1)
-  })
-
   describe('POST /signup', () => {
     test('Should return 200 on signup', async () => {
       await request(app)
