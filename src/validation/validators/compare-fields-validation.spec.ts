@@ -1,5 +1,5 @@
-import { InvalidParamError } from '../../presentation/errors'
 import { CompareFieldsValidation } from './compare-fields-validation'
+import { InvalidParamError } from '@/presentation/errors'
 
 const FIELD_NAME = 'any_field'
 const FIELD_NAME_TO_COMPARE = 'any_field_to_compare'
