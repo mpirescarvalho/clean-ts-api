@@ -5,6 +5,8 @@ import { Collection } from 'mongodb'
 import request from 'supertest'
 import jwt from 'jsonwebtoken'
 
+import { mockSurveyModel } from '@/domain/__test__'
+
 let surveyCollection: Collection
 let accountCollection: Collection
 
@@ -25,17 +27,6 @@ const makeAccessToken = async (): Promise<string> => {
   })
   return accessToken
 }
-
-const makeFakeSurvey = (): any => ({
-  question: 'Question',
-  answers: [{
-    answer: 'Answer 1',
-    image: 'http://image-name.com'
-  }, {
-    answer: 'Answer 2'
-  }],
-  date: new Date()
-})
 
 describe('Survey Routes', () => {
   beforeAll(async () => {
@@ -58,21 +49,33 @@ describe('Survey Routes', () => {
       await request(app)
         .put('/api/surveys/any_id/results')
         .send({
-          answer: 'any_answer'
+          answer: mockSurveyModel().answers[0].answer
         })
         .expect(403)
     })
 
     test('Should return 200 on save survey result with accessToken', async () => {
       const accessToken = await makeAccessToken()
-      const res = await surveyCollection.insertOne(makeFakeSurvey())
+      const res = await surveyCollection.insertOne(mockSurveyModel())
       await request(app)
         .put(`/api/surveys/${res.ops[0]._id}/results`)
         .set('x-access-token', accessToken)
         .send({
-          answer: 'Answer 1'
+          answer: mockSurveyModel().answers[0].answer
         })
         .expect(200)
+    })
+
+    test('Should return 403 on save survey result with invalid answer', async () => {
+      const accessToken = await makeAccessToken()
+      const res = await surveyCollection.insertOne(mockSurveyModel())
+      await request(app)
+        .put(`/api/surveys/${res.ops[0]._id}/results`)
+        .set('x-access-token', accessToken)
+        .send({
+          answer: 'invalid_answer'
+        })
+        .expect(403)
     })
   })
 })

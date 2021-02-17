@@ -5,6 +5,8 @@ import { Collection } from 'mongodb'
 import request from 'supertest'
 import jwt from 'jsonwebtoken'
 
+import { mockSurveyModel } from '@/domain/__test__'
+
 let surveyCollection: Collection
 let accountCollection: Collection
 
@@ -27,16 +29,6 @@ const makeAccessToken = async (): Promise<string> => {
   return accessToken
 }
 
-const makeFakeSurvey = (): any => ({
-  question: 'Question',
-  answers: [{
-    answer: 'Answer 1',
-    image: 'http://image-name.com'
-  }, {
-    answer: 'Answer 2'
-  }]
-})
-
 describe('Survey Routes', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
@@ -57,7 +49,7 @@ describe('Survey Routes', () => {
     test('Should return 403 on add survey without accessToken', async () => {
       await request(app)
         .post('/api/surveys')
-        .send(makeFakeSurvey())
+        .send(mockSurveyModel())
         .expect(403)
     })
 
@@ -66,7 +58,7 @@ describe('Survey Routes', () => {
       await request(app)
         .post('/api/surveys')
         .set('x-access-token', accessToken)
-        .send(makeFakeSurvey())
+        .send(mockSurveyModel())
         .expect(204)
     })
   })
